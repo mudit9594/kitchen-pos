@@ -58,11 +58,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         setSupabaseUser(session.user)
-        fetchUserProfile(session.user).then(setUser)
+        const userProfile = await fetchUserProfile(session.user)
+        setUser(userProfile)
       }
+      setLoading(false)
+    }).catch((error) => {
+      console.error('Error getting initial session:', error)
       setLoading(false)
     })
 
